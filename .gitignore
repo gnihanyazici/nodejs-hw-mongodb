@@ -1,0 +1,14 @@
+# Bağımlılıklar
+node_modules/
+
+# Ortam Değişkenleri (Şifreler)
+.env
+
+# İşletim Sistemi Dosyaları
+.DS_Store
+Thumbs.db
+
+# Log Dosyaları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
