@@ -1,7 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import { getAllContacts, getContactById } from './services/contacts.js';
+import {
+  getContactsController,
+  getContactByIdController,
+} from './controllers/contacts.js';
 
 export const setupServer = () => {
   const app = express();
@@ -10,34 +13,11 @@ export const setupServer = () => {
   app.use(pino());
   app.use(express.json());
 
-  // Tüm iletişimleri getiren rota (Adım 5)
-  app.get('/contacts', async (req, res) => {
-    const contacts = await getAllContacts();
-    res.status(200).json({
-      status: 200,
-      message: 'Successfully found contacts!',
-      data: contacts,
-    });
-  });
-
-  // ID'ye göre tek bir iletişim getiren rota (Adım 6)
-  app.get('/contacts/:contactId', async (req, res) => {
-    const { contactId } = req.params;
-    const contact = await getContactById(contactId);
-
-    if (!contact) {
-      return res.status(404).json({ message: 'Contact not found' });
-    }
-
-    res.status(200).json({
-      status: 200,
-      message: `Successfully found contact with id ${contactId}!`,
-      data: contact,
-    });
-  });
+  app.get('/contacts', getContactsController);
+  app.get('/contacts/:contactId', getContactByIdController);
 
   // Bulunamayan rotalar için 404
- app.use((req, res, next) => {
+  app.use((req, res) => {
     res.status(404).json({ message: 'Not found' });
   });
 
