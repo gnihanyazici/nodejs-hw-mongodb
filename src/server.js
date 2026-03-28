@@ -1,25 +1,25 @@
 import express from 'express';
-import cors from 'cors';
-import pino from 'pino-http';
-import {
-  getContactsController,
-  getContactByIdController,
-} from './controllers/contacts.js';
+// ... diğer importlar (cors, pino-http vb.)
+import contactsRouter from './routers/contacts.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 export const setupServer = () => {
   const app = express();
 
-  app.use(cors());
-  app.use(pino());
-  app.use(express.json());
+  // İstek gövdesini (body) JSON olarak okumak için zorunludur
+  app.use(express.json()); 
+  
+  // ... cors, logger middleware'leri
 
-  app.get('/contacts', getContactsController);
-  app.get('/contacts/:contactId', getContactByIdController);
+  // Rotaları bağlama
+  app.use('/contacts', contactsRouter);
 
-  // Bulunamayan rotalar için 404
-  app.use((req, res) => {
-    res.status(404).json({ message: 'Not found' });
-  });
+  // Bulunamayan rotalar (Listenin en sonunda olmalı)
+  app.use(notFoundHandler);
+  
+  // Genel hata yakalayıcı (En son çalışacak middleware)
+  app.use(errorHandler);
 
   const PORT = process.env.PORT || 3000;
   
