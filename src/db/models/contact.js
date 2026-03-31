@@ -12,8 +12,13 @@ const contactSchema = new mongoose.Schema(
       required: true,
       default: 'personal',
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
   },
-  { timestamps: true } // createdAt ve updatedAt alanlarını otomatik ekler
+  { timestamps: true }
 );
 
 export const Contact = mongoose.model('Contact', contactSchema);

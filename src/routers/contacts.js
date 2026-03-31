@@ -1,35 +1,38 @@
-import { Router } from "express";
-import { ctrlWrapper } from "../utils/ctrlWrapper.js";
+import { Router } from 'express';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import validateBody from '../middlewares/validateBody.js'; // Doğrulama middleware'i
+import { createContactSchema, updateContactSchema } from '../schemas/contacts.js'; // Şemalar
 import {
   getContactsController,
   getContactByIdController,
   createContactController,
   patchContactController,
   deleteContactController,
-} from "../controllers/contacts.js";
+} from '../controllers/contacts.js';
 
-import validateBody from "../middlewares/validateBody.js";
-import isValidId from "../middlewares/isValidId.js";
-import { createContactSchema, updateContactSchema } from "../schemas/contacts.js";
+import { authenticate } from '../middlewares/authenticate.js';
 
-const router = Router();
+const contactsRouter = Router();
 
-router.get("/", ctrlWrapper(getContactsController));
 
-router.get("/:contactId", isValidId, ctrlWrapper(getContactByIdController));
-router.delete("/:contactId", isValidId, ctrlWrapper(deleteContactController));
+contactsRouter.use(authenticate);
 
-router.post(
-  "/", 
-  validateBody(createContactSchema), 
+contactsRouter.get('/', ctrlWrapper(getContactsController));
+
+contactsRouter.get('/:contactId', ctrlWrapper(getContactByIdController));
+
+contactsRouter.post(
+  '/',
+  validateBody(createContactSchema),
   ctrlWrapper(createContactController)
 );
 
-router.patch(
-  "/:contactId", 
-  isValidId, 
-  validateBody(updateContactSchema), 
+contactsRouter.patch(
+  '/:contactId',
+  validateBody(updateContactSchema),
   ctrlWrapper(patchContactController)
 );
 
-export default router;
+contactsRouter.delete('/:contactId', ctrlWrapper(deleteContactController));
+
+export default contactsRouter;
