@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import validateBody from '../middlewares/validateBody.js'; // Doğrulama middleware'i
-import { createContactSchema, updateContactSchema } from '../schemas/contacts.js'; // Şemalar
+import validateBody from '../middlewares/validateBody.js'; 
+import { createContactSchema, updateContactSchema } from '../schemas/contacts.js'; 
 import {
   getContactsController,
   getContactByIdController,
@@ -11,9 +11,9 @@ import {
 } from '../controllers/contacts.js';
 
 import { authenticate } from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/upload.js'; // YENİ: upload middleware'i eklendi
 
 const contactsRouter = Router();
-
 
 contactsRouter.use(authenticate);
 
@@ -23,12 +23,14 @@ contactsRouter.get('/:contactId', ctrlWrapper(getContactByIdController));
 
 contactsRouter.post(
   '/',
+  upload.single('photo'), 
   validateBody(createContactSchema),
   ctrlWrapper(createContactController)
 );
 
 contactsRouter.patch(
   '/:contactId',
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController)
 );

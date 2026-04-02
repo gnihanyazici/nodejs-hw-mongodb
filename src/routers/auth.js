@@ -1,23 +1,30 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import  validateBody  from '../middlewares/validateBody.js';
-import { registerSchema, loginSchema } from '../schemas/auth.js';
+import validateBody from '../middlewares/validateBody.js';
+
+import { 
+  registerSchema, 
+  loginSchema, 
+  requestResetEmailSchema, 
+  resetPasswordSchema 
+} from '../schemas/auth.js';
+
 import {
   registerController,
   loginController,
   refreshUserSessionController,
   logoutUserController,
+  sendResetEmailController,
+  resetPasswordController,
 } from '../controllers/auth.js';
 
 const authRouter = Router();
-
 
 authRouter.post(
   '/register',
   validateBody(registerSchema),
   ctrlWrapper(registerController)
 );
-
 
 authRouter.post(
   '/login',
@@ -33,6 +40,20 @@ authRouter.post(
 authRouter.post(
   '/logout', 
   ctrlWrapper(logoutUserController)
+);
+
+
+authRouter.post(
+  '/send-reset-email',
+  validateBody(requestResetEmailSchema),
+  ctrlWrapper(sendResetEmailController)
+);
+
+// Adım 4: Yeni şifreyi belirleme rotası
+authRouter.post(
+  '/reset-pwd',
+  validateBody(resetPasswordSchema),
+  ctrlWrapper(resetPasswordController)
 );
 
 export default authRouter;

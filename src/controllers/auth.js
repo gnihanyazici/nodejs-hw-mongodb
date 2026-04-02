@@ -1,6 +1,13 @@
 import * as authServices from '../services/auth.js';
+import createHttpError from 'http-errors';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
-// Çerez ayarlarını tekrar tekrar yazmamak için yardımcı fonksiyon
+import { User } from '../db/models/User.js';
+import { Session } from '../db/models/Session.js';
+import { sendEmail } from '../services/email.js';
+
+
 const setupSessionCookies = (res, session) => {
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
@@ -62,4 +69,77 @@ export const logoutUserController = async (req, res) => {
   res.clearCookie('refreshToken');
 
   res.status(204).send();
+};
+
+// --- YENİ: ŞİFRE SIFIRLAMA İŞLEMLERİ ---
+
+export const sendResetEmailController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw createHttpError(404, 'User not found!');
+    }
+
+    // 5 dakikalık geçerliliği olan JWT oluştur
+    const resetToken = jwt.sign(
+      { email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '5m' }
+    );
+
+    // .env dosyasından domain'i al (APP_DOMAIN)
+    const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${resetToken}`;
+
+    // E-postayı gönder
+    await sendEmail({
+      to: email,
+      subject: 'Password Reset Request',
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+    });
+
+    res.status(200).json({
+      status: 200,
+      message: 'Reset password email has been successfully sent.',
+      data: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPasswordController = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    let decoded;
+    try {
+      // Token'ın geçerliliğini ve süresini kontrol et
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      throw createHttpError(401, 'Token is expired or invalid.');
+    }
+
+    const user = await User.findOne({ email: decoded.email });
+    if (!user) {
+      throw createHttpError(404, 'User not found!');
+    }
+
+    // Yeni şifreyi hash'le ve kaydet
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Güvenlik: Şifre değiştiği için kullanıcının mevcut tüm oturumlarını sonlandır
+    await Session.deleteMany({ userId: user._id });
+
+    res.status(200).json({
+      status: 200,
+      message: 'Password has been successfully reset.',
+      data: {},
+    });
+  } catch (error) {
+    next(error);
+  }
 };

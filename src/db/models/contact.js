@@ -17,6 +17,9 @@ const contactSchema = new mongoose.Schema(
       ref: 'user',
       required: true,
     },
+    photo: { 
+      type: String,
+    },
   },
   { timestamps: true }
 );

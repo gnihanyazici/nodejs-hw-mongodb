@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { User } from '../db/models/user.js'; // Model yolunun projene uygun olduğundan emin ol
+import { User } from '../db/models/User.js';
 import { Session } from '../db/models/Session.js';
 
 export const registerUser = async (payload) => {

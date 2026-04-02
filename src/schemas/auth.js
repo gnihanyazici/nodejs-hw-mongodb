@@ -10,3 +10,13 @@ export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
 });
+
+export const requestResetEmailSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+
+export const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  password: Joi.string().min(6).required(), // Yeni şifre de en az 6 karakter olmalı kurallara uygun olarak
+});
