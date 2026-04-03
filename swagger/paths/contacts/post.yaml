@@ -1,0 +1,37 @@
+tags:
+  - Contacts
+summary: Yeni bir kişi ekler
+operationId: createContact
+description: Oturum açmış kullanıcının rehberine yeni bir kişi kaydeder.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  description: Eklenecek kişinin bilgileri
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - phone
+        properties:
+          name:
+            type: string
+            example: "Ahmet Yılmaz"
+          email:
+            type: string
+            example: "ahmet@example.com"
+          phone:
+            type: string
+            example: "+905551234567"
+          favorite:
+            type: boolean
+            default: false
+responses:
+  '201':
+    description: Başarılı. Kişi oluşturuldu.
+  '400':
+    description: Doğrulama hatası (Örn. eksik veya hatalı veri).
+  '401':
+    description: Yetkisiz erişim. Geçerli bir token yok.

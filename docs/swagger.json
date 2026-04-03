@@ -1,0 +1,309 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Contacts API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "description": "Kullanıcıların kendi rehberlerini yönetebilecekleri, kimlik doğrulamalı (JWT) Contacts API dokümantasyonu."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Geliştirme Sunucusu"
+    },
+    {
+      "url": "https://senin-uygulamanin-adi.onrender.com",
+      "description": "Canlı Sunucu"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Contacts",
+      "description": "Kişi yönetimi uç noktaları"
+    },
+    {
+      "name": "Auth",
+      "description": "Kullanıcı yetkilendirme uç noktaları"
+    }
+  ],
+  "paths": {
+    "/contacts": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Tüm kişileri listeler",
+        "operationId": "getAllContacts",
+        "description": "Kullanıcıya ait tüm kişileri getirir. Sayfalandırma (page, limit) ve favori durumuna göre filtreleme yapılabilir.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Sayfa numarası"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Sayfa başına gösterilecek kayıt sayısı"
+          },
+          {
+            "in": "query",
+            "name": "favorite",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Sadece favori kişileri listelemek için true gönderin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı. Kişi listesi döndürüldü."
+          },
+          "401": {
+            "description": "Yetkisiz erişim. Geçerli bir Bearer token sağlanmadı."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Yeni bir kişi ekler",
+        "operationId": "createContact",
+        "description": "Oturum açmış kullanıcının rehberine yeni bir kişi kaydeder.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Eklenecek kişinin bilgileri",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "phone"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Ahmet Yılmaz"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "ahmet@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+905551234567"
+                  },
+                  "favorite": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Başarılı. Kişi oluşturuldu."
+          },
+          "400": {
+            "description": "Doğrulama hatası (Örn. eksik veya hatalı veri)."
+          },
+          "401": {
+            "description": "Yetkisiz erişim. Geçerli bir token yok."
+          }
+        }
+      }
+    },
+    "/contacts/{contactId}": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Belirli bir kişiyi getirir",
+        "operationId": "getContactById",
+        "description": "Verilen ID'ye (MongoDB ObjectId) sahip kişiyi veritabanından bulur ve döndürür.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Kişinin benzersiz ID'si"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı yanıt. Kişi bilgileri döndürüldü.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    },
+                    "favorite": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Yetkisiz erişim."
+          },
+          "404": {
+            "description": "Kişi bulunamadı."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Kişi bilgilerini günceller",
+        "operationId": "updateContact",
+        "description": "Belirtilen ID'ye sahip kişinin sadece gönderilen alanlarını günceller.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Güncellenecek kişinin benzersiz ID'si"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "favorite": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Başarılı. Güncellenmiş kişi verisi döndürüldü."
+          },
+          "400": {
+            "description": "Doğrulama hatası (Hatalı veri tipi vb.)."
+          },
+          "401": {
+            "description": "Yetkisiz erişim."
+          },
+          "404": {
+            "description": "Güncellenmek istenen kişi bulunamadı."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Kişiyi siler",
+        "operationId": "deleteContact",
+        "description": "Belirtilen ID'ye sahip kişiyi veritabanından kalıcı olarak siler.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Silinecek kişinin benzersiz ID'si"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı. Kişi silindi."
+          },
+          "401": {
+            "description": "Yetkisiz erişim."
+          },
+          "404": {
+            "description": "Silinmek istenen kişi bulunamadı."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+tags:
+  - Contacts
+summary: Kişiyi siler
+operationId: deleteContact
+description: Belirtilen ID'ye sahip kişiyi veritabanından kalıcı olarak siler.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+    description: Silinecek kişinin benzersiz ID'si
+responses:
+  '200':
+    description: Başarılı. Kişi silindi.
+  '401':
+    description: Yetkisiz erişim.
+  '404':
+    description: Silinmek istenen kişi bulunamadı.

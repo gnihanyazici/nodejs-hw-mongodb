@@ -1,0 +1,38 @@
+tags:
+  - Contacts
+summary: Kişi bilgilerini günceller
+operationId: updateContact
+description: Belirtilen ID'ye sahip kişinin sadece gönderilen alanlarını günceller.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+    description: Güncellenecek kişinin benzersiz ID'si
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+          email:
+            type: string
+          phone:
+            type: string
+          favorite:
+            type: boolean
+responses:
+  '200':
+    description: Başarılı. Güncellenmiş kişi verisi döndürüldü.
+  '400':
+    description: Doğrulama hatası (Hatalı veri tipi vb.).
+  '401':
+    description: Yetkisiz erişim.
+  '404':
+    description: Güncellenmek istenen kişi bulunamadı.

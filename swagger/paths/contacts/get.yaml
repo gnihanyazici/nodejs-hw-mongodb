@@ -1,0 +1,30 @@
+tags:
+  - Contacts
+summary: Tüm kişileri listeler
+operationId: getAllContacts
+description: Kullanıcıya ait tüm kişileri getirir. Sayfalandırma (page, limit) ve favori durumuna göre filtreleme yapılabilir.
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: page
+    schema:
+      type: integer
+      default: 1
+    description: Sayfa numarası
+  - in: query
+    name: limit
+    schema:
+      type: integer
+      default: 20
+    description: Sayfa başına gösterilecek kayıt sayısı
+  - in: query
+    name: favorite
+    schema:
+      type: boolean
+    description: Sadece favori kişileri listelemek için true gönderin
+responses:
+  '200':
+    description: Başarılı. Kişi listesi döndürüldü.
+  '401':
+    description: Yetkisiz erişim. Geçerli bir Bearer token sağlanmadı.

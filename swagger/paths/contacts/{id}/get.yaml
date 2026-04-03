@@ -1,0 +1,36 @@
+tags:
+  - Contacts
+summary: Belirli bir kişiyi getirir
+operationId: getContactById
+description: Verilen ID'ye (MongoDB ObjectId) sahip kişiyi veritabanından bulur ve döndürür.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+    description: Kişinin benzersiz ID'si
+responses:
+  '200':
+    description: Başarılı yanıt. Kişi bilgileri döndürüldü.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            _id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            favorite:
+              type: boolean
+  '401':
+    description: Yetkisiz erişim.
+  '404':
+    description: Kişi bulunamadı.

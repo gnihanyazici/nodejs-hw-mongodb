@@ -5,9 +5,11 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src/**/*.js",
-    "start": "node ./src/index.js",
-    "dev": "nodemon src/index.js"
+  "start": "node server.js",
+  "dev": "nodemon server.js",
+  "build": "npm run build-docs",
+  "build-docs": "redocly bundle docs/openapi.yaml --ext json -o docs/swagger.json",
+  "preview-docs": "redocly preview-docs"
   },
   "repository": {
     "type": "git",
@@ -35,9 +37,11 @@
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^8.0.4",
-    "pino-http": "^11.0.0"
+    "pino-http": "^11.0.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@redocly/cli": "^2.25.4",
     "eslint": "^10.1.0",
     "nodemon": "^3.1.14",
     "pino-pretty": "^13.1.3",
